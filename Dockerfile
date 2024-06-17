@@ -1,17 +1,18 @@
 # syntax=docker/dockerfile:1.3
-ARG GO_VERSION
+ARG GO_VERSION=1.22
 FROM --platform=${TARGETPLATFORM} golang:${GO_VERSION}-alpine AS base
 
 WORKDIR /go/src/cert-manager-webhook-gandi
 COPY go.* .
+COPY *.go .
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     apk add --no-cache git ca-certificates && \
     go mod download
 
 FROM base AS build
-ARG TARGETOS
-ARG TARGETARCH
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 
 RUN --mount=readonly,target=. --mount=type=cache,target=/go/pkg/mod \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -a -o /go/bin/webhook -ldflags '-w -extldflags "-static"' .
