@@ -1,0 +1,29 @@
+{
+	"cSpell.words": [
+		"apiextensions",
+		"apimachinery",
+		"apiserver",
+		"brotli",
+		"buildjob",
+		"bwolf",
+		"clientcfg",
+		"clientset",
+		"Clientset",
+		"cloudflare",
+		"cmmeta",
+		"containerport",
+		"extapi",
+		"fullname",
+		"gandi",
+		"github",
+		"Infof",
+		"kaniko",
+		"klog",
+		"kube",
+		"kubernetes",
+		"metav",
+		"Rrset",
+		"sintef",
+		"srcs"
+	]
+}

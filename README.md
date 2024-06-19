@@ -2,16 +2,18 @@
 
 This is a completely temporary README.md. At this time, I just did a fork from sintef version of the Webhook, who was mostly a port of bwolf version.
 
+The original README is still present, as README-orig.md
+
 The goals for this port are (at least):
 
-* Allow the use of a Gandui Token instead of the API KEY
+* Allow the use of a Gandi Token instead of the API KEY (requires the use of the lib gandi-go in version 0.7.0 at least)
 * Correct a small cosmetic bug in the log in level 6 mode (a missing dot between the hostname and the domain)
 * update to most recent dependencies
-* If possible, find why this plugin is not working when more than one domain name is found
+* If possible, find why this plugin is not working when more than one domain name is given for the SAN field.
 
 For now, I just was able to add a buildjob.yaml file, allowing me to build the image in kaniko on my k3s testbed. This is heavily a Work In Progress, as, for instance, the source path is hardcoded in the yaml file. But, so far, starting the job build in 4 minutes a container image, stored in my local repository.
 
-While really strightforward, here is the current build process (Not really ready to use make!)
+While really straightforward, here is the current build process (Not really ready to use make!)
 
 ~~~bash
 # to start the build (I'm currently using the default namespace, as this is mostly a temporary job)
@@ -53,6 +55,6 @@ fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.
 Executing busybox-1.36.1-r28.trigger
 OK: 20 MiB in 27 packages
 INFO[0018] Taking snapshot of full filesystem...
-~~~   
+~~~
 
 Next step is to see if this image actually works, before I try to make change on it.

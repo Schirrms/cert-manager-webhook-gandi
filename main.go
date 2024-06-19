@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/cert-manager/cert-manager/pkg/acme/webhook/apis/acme/v1alpha1"
 	"github.com/cert-manager/cert-manager/pkg/acme/webhook/cmd"
 	cmmeta "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
@@ -14,8 +17,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
-	"os"
-	"strings"
 )
 
 const (
@@ -123,7 +124,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 
 	record, err := gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
 	if err != nil {
-		klog.V(6).Infof("There is no entry of TXT matching, creating a new one for %s with value \"%s\"", subdomain+root, ch.Key)
+		klog.V(6).Infof("There is no entry of TXT matching, creating a new one for %s.%s with value \"%s\"", subdomain, root, ch.Key)
 		_, err := gandiClient.CreateDomainRecord(root, subdomain, "TXT", GandiMinTtl, []string{ch.Key})
 		if err != nil {
 			return fmt.Errorf("unable to create TXT record: %v", err)
@@ -190,7 +191,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 }
 
 // Initialize will be called when the webhook first starts.
-// This method can be used to instantiate the webhook, i.e. initialising
+// This method can be used to instantiate the webhook, i.e. initializing
 // connections or warming up caches.
 // Typically, the kubeClientConfig parameter is used to build a Kubernetes
 // client that can be used to fetch resources from the Kubernetes API, e.g.

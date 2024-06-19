@@ -3,8 +3,8 @@ module github.com/bwolf/cert-manager-webhook-gandi
 go 1.19
 
 require (
-	github.com/cert-manager/cert-manager v1.11.0
-	github.com/go-gandi/go-gandi v0.6.0
+	github.com/cert-manager/cert-manager v1.15.0
+	github.com/go-gandi/go-gandi v0.7.0
 	k8s.io/apiextensions-apiserver v0.26.1
 	k8s.io/apimachinery v0.26.1
 	k8s.io/client-go v0.26.1
