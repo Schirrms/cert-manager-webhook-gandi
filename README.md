@@ -1,17 +1,20 @@
 # cert-manager-webhook-gandi
 
-This is a completely temporary README.md. At this time, I just did a fork from sintef version of the Webhook, who was mostly a port of bwolf version.
+This is a completely temporary README.md. At this time, I just did a fork from sintef version of the Webhook, who is
+mostly an updated port of bwolf version.
 
 The original README is still present, as README-orig.md
 
 The goals for this port are (at least):
 
-* Allow the use of a Gandi Token instead of the API KEY (requires the use of the lib gandi-go in version 0.7.0 at least)
+* Allow the use of a Gandi Token instead of the API KEY (requires the use of the lib gandi-go in version >= 0.7.0)
 * Correct a small cosmetic bug in the log in level 6 mode (a missing dot between the hostname and the domain)
 * update to most recent dependencies
 * If possible, find why this plugin is not working when more than one domain name is given for the SAN field.
 
-For now, I just was able to add a buildjob.yaml file, allowing me to build the image in kaniko on my k3s testbed. This is heavily a Work In Progress, as, for instance, the source path is hardcoded in the yaml file. But, so far, starting the job build in 4 minutes a container image, stored in my local repository.
+For now, I just was able to add a buildjob.yaml file, allowing me to build the image in kaniko on my k3s testbed.
+This is heavily a Work In Progress, as, for instance, the source path is hardcoded in the yaml file. But, so far,
+starting the job build in 4 minutes a container image, stored in my local repository.
 
 While really straightforward, here is the current build process (Not really ready to use make!)
 
@@ -58,3 +61,11 @@ INFO[0018] Taking snapshot of full filesystem...
 ~~~
 
 Next step is to see if this image actually works, before I try to make change on it.
+
+To use this image locally go in the subfolder 'charts' and use the command
+
+~~~bash
+helm install cert-manager-webhook-gandi cert-manager-webhook-gandi {all the needed option}
+~~~
+
+The first 'cert-manager-webhook-gandi' will be the name of the deployment, and the second 'cert-manager-webhook-gandi' is the reference to the repository, in this case the sub-folder with the same name.

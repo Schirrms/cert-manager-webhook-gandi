@@ -124,14 +124,14 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 
 	record, err := gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
 	if err != nil {
-		klog.V(6).Infof("There is no entry of TXT matching, creating a new one for %s.%s with value \"%s\"", subdomain, root, ch.Key)
+		klog.V(6).Infof("There is no entry of type TXT matching, creating a new one for %s.%s with value \"%s\"", subdomain, root, ch.Key)
 		_, err := gandiClient.CreateDomainRecord(root, subdomain, "TXT", GandiMinTtl, []string{ch.Key})
 		if err != nil {
 			return fmt.Errorf("unable to create TXT record: %v", err)
 		}
 	} else {
 		if strings.Join(record.RrsetValues, "") != "\""+ch.Key+"\"" {
-			klog.V(6).Infof("Current record exists for %s value is %s, new value will be \"%s\"", subdomain+root, strings.Join(record.RrsetValues, ""), ch.Key)
+			klog.V(6).Infof("Current record exists for %s.%s value is %s, new value will be \"%s\"", subdomain, root, strings.Join(record.RrsetValues, ""), ch.Key)
 			_, err := gandiClient.UpdateDomainRecordByNameAndType(root, subdomain, "TXT", GandiMinTtl, []string{ch.Key})
 			if err != nil {
 				return fmt.Errorf("unable to update TXT record: %v", err)
@@ -179,7 +179,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 
 	_, err = gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
 	if err != nil {
-		klog.V(6).Infof("There is no entry of TXT matching, do nothing", subdomain+root, ch.Key)
+		klog.V(6).Infof("There is no entry %s.%s of type TXT matching %s, do nothing", subdomain, root, ch.Key)
 	} else {
 		err := gandiClient.DeleteDomainRecord(root, subdomain, "TXT")
 		if err != nil {

@@ -21,6 +21,7 @@
 		"klog",
 		"kube",
 		"kubernetes",
+		"letsencrypt",
 		"metav",
 		"Rrset",
 		"sintef",
