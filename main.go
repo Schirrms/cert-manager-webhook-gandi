@@ -107,10 +107,13 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 		return fmt.Errorf("unable to get API key: %v", err)
 	}
 
+	// For now, I try to 'force' the use of a Personal Token
+	// The original second line was: APIKey: *apiKey,
 	clientcfg := &config.Config{
-		APIKey: *apiKey,
-		Debug:  false,
-		DryRun: false,
+		APIKey:              "",
+		PersonalAccessToken: *apiKey,
+		Debug:               false,
+		DryRun:              false,
 	}
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
 
@@ -163,10 +166,13 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 		return fmt.Errorf("unable to get API key: %v", err)
 	}
 
+	// For now, I try to 'force' the use of a Personal Token
+	// The original second line was: APIKey: *apiKey,
 	clientcfg := &config.Config{
-		APIKey: *apiKey,
-		Debug:  true,
-		DryRun: false,
+		APIKey:              "",
+		PersonalAccessToken: *apiKey,
+		Debug:               true,
+		DryRun:              false,
 	}
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
 
