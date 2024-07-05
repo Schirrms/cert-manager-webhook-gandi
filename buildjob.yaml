@@ -1,19 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  creationTimestamp: null
-  name: cert-manager-webhook-gandi-build-0-4-6
+  name: cert-manager-webhook-gandi-build-0-4-7
 spec:
   template:
-    metadata:
-      creationTimestamp: null
     spec:
       containers:
       - image: gcr.io/kaniko-project/executor:latest
         args: 
         - "--dockerfile=/tmp/build/Dockerfile"
         - "--context=dir:///tmp/build"
-        - "--destination=registry.sub0001.sacem.fr/cert-manager-webhook-gandi:0.4.6"
+        - "--destination=registry.sub0001.sacem.fr/cert-manager-webhook-gandi:0.4.7"
         name: cert-manager-webhook-gandi
         resources: {}
         volumeMounts:
