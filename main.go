@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/cert-manager/cert-manager/pkg/acme/webhook/apis/acme/v1alpha1"
@@ -79,6 +80,12 @@ func (c *gandiDNSProviderSolver) Name() string {
 	return "gandi"
 }
 
+func getFunctionName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	fn := runtime.FuncForPC(pc)
+	return fn.Name()
+}
+
 func extractRootAndSubDomain(fqdn string, entry string) (string, string, error) {
 	parts := strings.Split(strings.Trim(fqdn, "."), ".")
 	domain := parts[len(parts)-2] + "." + parts[len(parts)-1]
@@ -92,8 +99,8 @@ func extractRootAndSubDomain(fqdn string, entry string) (string, string, error) 
 // cert-manager itself will later perform a self check to ensure that the
 // solver has correctly configured the DNS provider.
 func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
-	klog.V(6).Infof("call function Present: namespace=%s, zone=%s, fqdn=%s",
-		ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
+	klog.V(6).Infof("call function %s: namespace=%s, zone=%s, fqdn=%s",
+		getFunctionName(), ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
 
 	cfg, err := loadConfig(ch.Config)
 	if err != nil {
@@ -112,7 +119,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 	clientcfg := &config.Config{
 		APIKey:              "",
 		PersonalAccessToken: *apiKey,
-		Debug:               false,
+		Debug:               klog.V(6).Enabled(),
 		DryRun:              false,
 	}
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
@@ -122,7 +129,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 
 	root, subdomain, err := extractRootAndSubDomain(domain, entry)
 	if err != nil {
-		return fmt.Errorf("unable to mange provided domain : %v", err)
+		return fmt.Errorf("unable to manage provided domain : %v", err)
 	}
 
 	record, err := gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
@@ -151,8 +158,8 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 // This is in order to facilitate multiple DNS validations for the same domain
 // concurrently.
 func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
-	klog.V(6).Infof("call function CleanUp: namespace=%s, zone=%s, fqdn=%s",
-		ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
+	klog.V(6).Infof("call function %s: namespace=%s, zone=%s, fqdn=%s",
+		getFunctionName(), ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
 
 	cfg, err := loadConfig(ch.Config)
 	if err != nil {
@@ -171,7 +178,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 	clientcfg := &config.Config{
 		APIKey:              "",
 		PersonalAccessToken: *apiKey,
-		Debug:               true,
+		Debug:               klog.V(6).Enabled(),
 		DryRun:              false,
 	}
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
@@ -180,7 +187,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 
 	root, subdomain, err := extractRootAndSubDomain(domain, entry)
 	if err != nil {
-		return fmt.Errorf("unable to mange provided domain : %v", err)
+		return fmt.Errorf("unable to manage provided domain : %v", err)
 	}
 
 	_, err = gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")

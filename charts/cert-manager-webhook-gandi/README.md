@@ -28,7 +28,7 @@ helm install cert-manager-webhook-gandi cert-manager-webhook-gandi/cert-manager-
 | features.apiPriorityAndFairness | bool | `true` | It is enabled by default since a while. |
 | fullnameOverride | string | `""` | Set to override the fullname |
 | gandiApiToken | string | `""` | The secret is not created if not set. |
-| groupName | string | `"acme.bwolf.me"` | "Group is the API group name this server hosts", if you find this description helful. |
+| groupName | string | `"acme.bwolf.me"` | "Group is the API group name this server hosts", if you find this description helpful. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/sintef/cert-manager-webhook-gandi"` | Image name |
 | image.tag | string | `""` | Image tag (default to Chart's appVersion) |
