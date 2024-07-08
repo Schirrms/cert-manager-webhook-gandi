@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cert-manager-webhook-gandi-build-0-4-7
+  name: cert-manager-webhook-gandi-build-0-4-8
 spec:
   template:
     spec:
@@ -10,7 +10,7 @@ spec:
         args: 
         - "--dockerfile=/tmp/build/Dockerfile"
         - "--context=dir:///tmp/build"
-        - "--destination=registry.sub0001.sacem.fr/cert-manager-webhook-gandi:0.4.7"
+        - "--destination=registry.sub0001.sacem.fr/cert-manager-webhook-gandi:0.4.8"
         name: cert-manager-webhook-gandi
         resources: {}
         volumeMounts:
