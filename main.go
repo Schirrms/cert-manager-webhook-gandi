@@ -80,10 +80,14 @@ func (c *gandiDNSProviderSolver) Name() string {
 	return "gandi"
 }
 
+// Get the function name for logging
 func getFunctionName() string {
 	pc, _, _, _ := runtime.Caller(1)
 	fn := runtime.FuncForPC(pc)
-	return fn.Name()
+	// return only the last part of the function name
+	parts := strings.Split(fn.Name(), ".")
+	lastPart := parts[len(parts)-1]
+	return lastPart
 }
 
 func extractRootAndSubDomain(fqdn string, entry string) (string, string, error) {
@@ -99,7 +103,7 @@ func extractRootAndSubDomain(fqdn string, entry string) (string, string, error) 
 // cert-manager itself will later perform a self check to ensure that the
 // solver has correctly configured the DNS provider.
 func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
-	klog.V(6).Infof("call function %s: namespace=%s, zone=%s, fqdn=%s",
+	klog.V(6).Infof("[DEBUG] call function %s: namespace=%s, zone=%s, fqdn=%s",
 		getFunctionName(), ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
 
 	cfg, err := loadConfig(ch.Config)
@@ -107,7 +111,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 		return fmt.Errorf("unable to load config: %v", err)
 	}
 
-	klog.V(6).Infof("decoded configuration %v", cfg)
+	klog.V(6).Infof("[DEBUG] decoded configuration %v", cfg)
 
 	apiKey, err := c.getApiKey(&cfg, ch.ResourceNamespace)
 	if err != nil {
@@ -125,7 +129,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
 
 	entry, domain := c.getDomainAndEntry(ch)
-	klog.V(6).Infof("present for entry=%s, domain=%s", entry, domain)
+	klog.V(6).Infof("[DEBUG] present for entry=%s, domain=%s", entry, domain)
 
 	root, subdomain, err := extractRootAndSubDomain(domain, entry)
 	if err != nil {
@@ -134,14 +138,14 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 
 	record, err := gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
 	if err != nil {
-		klog.V(6).Infof("There is no entry of type TXT matching, creating a new one for %s.%s with value \"%s\"", subdomain, root, ch.Key)
+		klog.V(6).Infof("[DEBUG] There is no entry of type TXT matching, creating a new one for %s.%s with value \"%s\"", subdomain, root, ch.Key)
 		_, err := gandiClient.CreateDomainRecord(root, subdomain, "TXT", GandiMinTtl, []string{ch.Key})
 		if err != nil {
 			return fmt.Errorf("unable to create TXT record: %v", err)
 		}
 	} else {
 		if strings.Join(record.RrsetValues, "") != "\""+ch.Key+"\"" {
-			klog.V(6).Infof("Current record exists for %s.%s value is %s, new value will be \"%s\"", subdomain, root, strings.Join(record.RrsetValues, ""), ch.Key)
+			klog.V(6).Infof("[DEBUG] Current record exists for %s.%s value is %s, new value will be \"%s\"", subdomain, root, strings.Join(record.RrsetValues, ""), ch.Key)
 			_, err := gandiClient.UpdateDomainRecordByNameAndType(root, subdomain, "TXT", GandiMinTtl, []string{ch.Key})
 			if err != nil {
 				return fmt.Errorf("unable to update TXT record: %v", err)
@@ -158,7 +162,7 @@ func (c *gandiDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 // This is in order to facilitate multiple DNS validations for the same domain
 // concurrently.
 func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
-	klog.V(6).Infof("call function %s: namespace=%s, zone=%s, fqdn=%s",
+	klog.V(6).Infof("[DEBUG] call function %s: namespace=%s, zone=%s, fqdn=%s",
 		getFunctionName(), ch.ResourceNamespace, ch.ResolvedZone, ch.ResolvedFQDN)
 
 	cfg, err := loadConfig(ch.Config)
@@ -166,7 +170,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 		return fmt.Errorf("unable to load config: %v", err)
 	}
 
-	klog.V(6).Infof("decoded configuration %v", cfg)
+	klog.V(6).Infof("[DEBUG] decoded configuration %v", cfg)
 
 	apiKey, err := c.getApiKey(&cfg, ch.ResourceNamespace)
 	if err != nil {
@@ -184,6 +188,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 	gandiClient := gandi.NewLiveDNSClient(*clientcfg)
 
 	entry, domain := c.getDomainAndEntry(ch)
+	klog.V(6).Infof("[DEBUG] present for entry=%s, domain=%s", entry, domain)
 
 	root, subdomain, err := extractRootAndSubDomain(domain, entry)
 	if err != nil {
@@ -192,7 +197,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 
 	_, err = gandiClient.GetDomainRecordByNameAndType(root, subdomain, "TXT")
 	if err != nil {
-		klog.V(6).Infof("There is no entry %s.%s of type TXT matching %s, do nothing", subdomain, root, ch.Key)
+		klog.V(6).Infof("[DEBUG] There is no entry %s.%s of type TXT matching %s, do nothing", subdomain, root, ch.Key)
 	} else {
 		err := gandiClient.DeleteDomainRecord(root, subdomain, "TXT")
 		if err != nil {
@@ -213,7 +218,7 @@ func (c *gandiDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 // The stopCh can be used to handle early termination of the webhook, in cases
 // where a SIGTERM or similar signal is sent to the webhook process.
 func (c *gandiDNSProviderSolver) Initialize(kubeClientConfig *rest.Config, _ <-chan struct{}) error {
-	klog.V(6).Infof("call function Initialize")
+	klog.V(6).Infof("[DEBUG] call function %s", getFunctionName())
 	cl, err := kubernetes.NewForConfig(kubeClientConfig)
 	if err != nil {
 		return fmt.Errorf("unable to get k8s client: %v", err)
@@ -249,7 +254,7 @@ func (c *gandiDNSProviderSolver) getDomainAndEntry(ch *v1alpha1.ChallengeRequest
 func (c *gandiDNSProviderSolver) getApiKey(cfg *gandiDNSProviderConfig, namespace string) (*string, error) {
 	secretName := cfg.APIKeySecretRef.LocalObjectReference.Name
 
-	klog.V(6).Infof("try to load secret `%s` with key `%s`", secretName, cfg.APIKeySecretRef.Key)
+	klog.V(6).Infof("[DEBUG] try to load secret `%s` with key `%s`", secretName, cfg.APIKeySecretRef.Key)
 
 	sec, err := c.client.CoreV1().Secrets(namespace).Get(context.Background(), secretName, metav1.GetOptions{})
 	if err != nil {
