@@ -10,15 +10,23 @@ spec:
         args: 
         - "--dockerfile=/tmp/build/Dockerfile"
         - "--context=dir:///tmp/build"
-        - "--destination=registry.sub0001.sacem.fr/cert-manager-webhook-gandi:0.4.8"
+        - "--destination=ghcr.io/schirrms/cert-manager-webhook-gandi:0.4.8"
         name: cert-manager-webhook-gandi
         resources: {}
         volumeMounts:
         - name: build-tools-volume
           mountPath: /tmp/build
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker
       volumes:
         - name: build-tools-volume
           hostPath: 
             path: /work/git/cert-manager-webhook-gandi
+        - name: kaniko-secret
+          secret:
+            secretName: ghcrcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
       restartPolicy: Never
 status: {}

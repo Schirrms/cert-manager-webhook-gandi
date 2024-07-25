@@ -26,3 +26,6 @@
 # Make artifacts
 _out
 _test
+
+# ghcr credentials
+/config.json

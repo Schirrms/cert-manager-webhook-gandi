@@ -7,15 +7,14 @@ A Helm chart for cert-manager-webhook-gandi.
 Install the helm chart repository:
 
 ```bash
-helm repo add cert-manager-webhook-gandi https://sintef.github.io/cert-manager-webhook-gandi
+helm repo add cert-manager-webhook-gandi https://schirrms.github.io/cert-manager-webhook-gandi
 ```
 
 Install the chart:
 
 ```bash
-helm install cert-manager-webhook-gandi cert-manager-webhook-gandi/cert-manager-webhook-gandi -f gandiApiToken=XXX_EXAMPLE_XXX
+helm install cert-manager-webhook-gandi cert-manager-webhook-gandi/cert-manager-webhook-gandi -f gandiApiToken{Your personal Gandi Access Token}
 ```
-
 
 ## Values
 
@@ -30,7 +29,7 @@ helm install cert-manager-webhook-gandi cert-manager-webhook-gandi/cert-manager-
 | gandiApiToken | string | `""` | The secret is not created if not set. |
 | groupName | string | `"acme.bwolf.me"` | "Group is the API group name this server hosts", if you find this description helpful. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| image.repository | string | `"ghcr.io/sintef/cert-manager-webhook-gandi"` | Image name |
+| image.repository | string | `"ghcr.io/schirrms/cert-manager-webhook-gandi"` | Image name |
 | image.tag | string | `""` | Image tag (default to Chart's appVersion) |
 | logLevel | int | `2` | Verbosity of the logs. Set to 6 for verbose logs. |
 | nameOverride | string | `""` | Set to override the name |
@@ -39,5 +38,3 @@ helm install cert-manager-webhook-gandi cert-manager-webhook-gandi/cert-manager-
 | service.port | int | `443` | Service port |
 | service.type | string | `"ClusterIP"` | Service type, e.g. ClusterIP, NodePort, LoadBalancer |
 | tolerations | list | `[]` |  |
-
-----------------------------------------------

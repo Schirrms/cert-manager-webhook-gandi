@@ -9,7 +9,7 @@ certManager:
   serviceAccountName: cert-manager
 image:
   # -- Image name
-  repository: registry.sub0001.sacem.fr/cert-manager-webhook-gandi
+  repository: ghcr.io/schirrms/cert-manager-webhook-gandi
   # -- Image tag (default to Chart's appVersion)
   tag: ""
   # -- Image pull policy
